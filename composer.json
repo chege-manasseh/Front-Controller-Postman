@@ -1,0 +1,15 @@
+{
+    "name": "manasseh/front-controller-postman",
+    "autoload": {
+        "psr-4": {
+            "Manasseh\\FrontControllerPostman\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "chege-manasseh",
+            "email": "chegemanasseh2@gmail.com"
+        }
+    ],
+    "require": {}
+}
