@@ -1,0 +1,9 @@
+# Apache rewrite rules for XAMPP when project root is in htdocs.
+# This forwards all requests to /public while keeping clean URLs.
+RewriteEngine On
+
+# Avoid rewrite loop if request already targets /public.
+RewriteCond %{REQUEST_URI} !^(.*/)?public/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ public/$1 [L,QSA]
