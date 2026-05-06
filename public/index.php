@@ -1,28 +1,20 @@
 <?php
 
 use Core\Router;
-use Config\Database;
 require_once '../vendor/autoload.php';
-require_once "../config/database.php";
-//load routes
-require_once '../routes/web.php';
-require_once "../vendor/autoload.php";
+
+// Load environment variables
+$dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->load();
 
 $router = new Router();
 
-
-// Load .env
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . "/..");
-$dotenv->load();
-
-$db = new Database();
-$conn = $db->connect();
+// Load routes (must come after $router is instantiated)
+require_once '../routes/web.php';
 
 // Match the current request
 $method = $_SERVER['REQUEST_METHOD'];
 $route = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-
 
 // Normalize route when app is accessed via symlink/subdirectory.
 $scriptBase = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
@@ -66,4 +58,10 @@ if (!method_exists($controllerInstance, $action)) {
     exit;
 }
 
-$controllerInstance->$action();
+$request = new \Core\Request();
+$response = $controllerInstance->$action($request);
+
+if (is_array($response)) {
+    header('Content-Type: application/json');
+    echo json_encode($response);
+}

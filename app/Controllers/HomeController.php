@@ -6,7 +6,4 @@ class HomeController {
         echo "Welcome to the Front Controller Legacy Data!";
     }
 
-    public function Login() {
-        echo "Login page";
-    }
 }
