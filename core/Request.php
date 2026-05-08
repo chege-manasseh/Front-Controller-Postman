@@ -33,39 +33,31 @@ class Request
 
     public function getData()
     {
-        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        $data = $_GET;
 
-        // 1. Always start with URL parameters (GET)
-        $this->data = $_GET;
-
-        // 2. Handle Body Data based on Content-Type
         if ($this->method !== 'GET') {
+            $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+
             if (str_contains($contentType, 'application/json')) {
-                // Handle JSON (API requests)
                 $json = json_decode(file_get_contents('php://input'), true);
-                $this->data = array_merge($this->data, $json ?? []);
+                $data = array_merge($data, $json ?? []);
             } elseif (
                 str_contains($contentType, 'application/x-www-form-urlencoded') ||
                 str_contains($contentType, 'multipart/form-data')
             ) {
-
-                // Handle Form Data (Standard MVC Forms)
-                // POST is auto-filled by PHP, but PUT/PATCH are not.
                 if ($this->method === 'POST') {
-                    $this->data = array_merge($this->data, $_POST);
+                    $data = array_merge($data, $_POST);
                 } else {
-                    // For PUT/PATCH form-encoded data
                     parse_str(file_get_contents('php://input'), $parsed);
-                    $this->data = array_merge($this->data, $parsed);
+                    $data = array_merge($data, $parsed);
                 }
             }
         }
 
-        // 3. Include File Uploads (Optional but helpful for MVC)
         if (!empty($_FILES)) {
-            $this->data = array_merge($this->data, $_FILES);
+            $data = array_merge($data, $_FILES);
         }
 
-        return $this->data;
+        return $data;
     }
 }

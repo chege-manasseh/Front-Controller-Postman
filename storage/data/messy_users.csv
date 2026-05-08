@@ -1,0 +1,12 @@
+email,id,name,phone,status
+john@example.com,1,John Doe,0712345678,
+,2,Jane Smith,0722334455,
+PETER@EMAIL.COM,3,  peter KIMANI ,0733445566,
+dup@example.com,3,Peter Kimani Duplicate,0733445566,
+amina.hassan#email.com,4,Amina Hassan,0700112233,
+david.mwangi@example.com,5,David Mwangi,,
+,6,Grace Wanjiku,0711223344,
+brian.otieno@example.com,7,Brian Otieno,0700998877,active
+linda.achieng@example.com,8,Linda Achieng,0711001122,
+samuel.kiptoo@example.com, 9 , Samuel Kiptoo ,0722003344,
+,10,Nancy Chebet,,
