@@ -36,7 +36,7 @@ if ($routeInfo === null) {
     exit;
 }
 
-$routeParts = explode('@', $routeInfo, 2);
+$routeParts = explode('@', $routeInfo['action'], 2);
 if (count($routeParts) !== 2) {
     http_response_code(500);
     echo '500 Invalid route action';
@@ -44,6 +44,7 @@ if (count($routeParts) !== 2) {
 }
 
 list($controller, $action) = $routeParts;
+$params = $routeInfo['params'];
 
 if (!class_exists($controller)) {
     http_response_code(500);
@@ -59,9 +60,12 @@ if (!method_exists($controllerInstance, $action)) {
 }
 
 $request = new \Core\Request();
-$response = $controllerInstance->$action($request);
+$response = $controllerInstance->$action($request, ...$params);
 
 if (is_array($response)) {
     header('Content-Type: application/json');
     echo json_encode($response);
 }
+
+
+// Since your index.php is also handling JSON responses at the bottom, does your Request class have a way to detect if the current request is an AJAX/API call versus a standard page load?

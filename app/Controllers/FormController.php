@@ -22,12 +22,5 @@ class FormController {
                 'message' => "Invalid credentials for $username."
             ];
         }
-        
-        // You can also access specific fields like:
-        // $name = $data['name'] ?? 'Guest';
-        return [
-            
-        ];
-    
     }
 }
