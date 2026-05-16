@@ -18,9 +18,9 @@ class Database
 
             try {
                 $dsn = "mysql:host=$host;dbname=$dbname;charset=utf8mb4";
-                self::$instance = new \PDO($dsn, $user, $pass);
-                self::$instance->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            } catch (\PDOException $e) {
+                self::$instance = new PDO($dsn, $user, $pass);
+                self::$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            } catch (PDOException $e) {
                 die("Connection failed: " . $e->getMessage());
             }
         }

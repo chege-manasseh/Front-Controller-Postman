@@ -4,40 +4,55 @@ namespace Core;
 
 class Request
 {
+    private string $method;
+    private string $path;
+    private array  $data;
 
-    //Your Request class should answer:
-    // What method is this?
-    // What data came in?
-    // In what format?
-    // Give me a clean way to access it
-
-    private $method;
-    private $path;
-    private $data;
     public function __construct()
     {
         $this->method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        $this->path = $this->getPath();
-        $this->data = $this->getData();
+        $this->path   = $this->parsePath();
+        $this->data   = $this->parseData();
     }
 
-    public function getPath()
+    public function getMethod(): string
     {
-        $path = $_SERVER['REQUEST_URI'] ?? '/';
+        return $this->method;
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    public function input(string $key, mixed $default = null): mixed
+    {
+        return $this->data[$key] ?? $default;
+    }
+
+    public function file(string $key): ?array
+    {
+        return $_FILES[$key] ?? null;
+    }
+
+    private function parsePath(): string
+    {
+        $path     = $_SERVER['REQUEST_URI'] ?? '/';
         $position = strpos($path, '?');
-        if ($position === false) {
-            return $path;
-        }
-        return substr($path, 0, $position);
+        return $position === false ? $path : substr($path, 0, $position);
     }
 
-    public function getData()
+    private function parseData(): array
     {
-        $data = $_GET;
+        $data        = $_GET;
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
 
         if ($this->method !== 'GET') {
-            $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
-
             if (str_contains($contentType, 'application/json')) {
                 $json = json_decode(file_get_contents('php://input'), true);
                 $data = array_merge($data, $json ?? []);
@@ -54,10 +69,7 @@ class Request
             }
         }
 
-        if (!empty($_FILES)) {
-            $data = array_merge($data, $_FILES);
-        }
-
         return $data;
     }
 }
+

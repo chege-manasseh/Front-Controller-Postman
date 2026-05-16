@@ -1,8 +1,22 @@
 composer.phar
 /vendor/
+
+# Environment — never commit secrets
 .env
 .env.local
 .env.*.local
-# Commit your application's lock file https://getcomposer.org/doc/01-basic-usage.md#commit-your-composer-lock-file-to-version-control
-# You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
-# composer.lock
+
+# Uploaded files (keep directory via .gitkeep)
+/storage/uploads/*
+!/storage/uploads/.gitkeep
+
+# Logs & cache
+/storage/cache/*
+!/storage/cache/.gitkeep
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

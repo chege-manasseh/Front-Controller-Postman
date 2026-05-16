@@ -1,66 +1,79 @@
 <?php
 
 namespace Models;
-
+use Exception;
 class Users extends Model
 {
+    private string $dataFile = __DIR__ . '/../../storage/data/users.csv';
 
-
-    public  function checkCredentials($username, $password)
+    public function getAllUsers(): array
     {
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE username = :username");
-        $stmt->execute(['username' => $username]);
-        $user = $stmt->fetch();
+        $handle  = fopen($this->dataFile, 'r');
+        $headers = array_map('strtolower', fgetcsv($handle));
+        $users   = [];
 
-        if ($user && password_verify($password, $user['password'])) {
-            return $user;
-        } else {
-            return false;
+        while (($row = fgetcsv($handle)) !== false) {
+            $users[] = array_combine($headers, $row);
         }
+
+        fclose($handle);
+        return $users;
     }
 
-    public function createUser() {}
-
-    public function getUserById($id)
+    public function getUserById(int $id): ?array
     {
-        $filename = __DIR__ . '/../../storage/data/messy_users.csv';
-        $handle = fopen($filename, "r");
+        $handle  = fopen($this->dataFile, 'r');
+        $headers = array_map('strtolower', fgetcsv($handle));
 
-        // 1. Read the very first row (the headers)
-        $rawheaders = fgetcsv($handle);
-        $headers = array_map('strtolower', $rawheaders);
-        // 2. Find where "id" is located (it might be at 0, 1, or 5!)
-        $idIndex = array_search('id', $headers);
-
-        if ($idIndex === false) {
-            die("Error: This CSV doesn't have an 'id' column.");
-        }
-
-        // 3. Now loop through the rest of the data
-        while (($data = fgetcsv($handle)) !== false) {
-            // Use the dynamic index 
-            if ($data[$idIndex] == $id) {
+        while (($row = fgetcsv($handle)) !== false) {
+            $record = array_combine($headers, $row);
+            if ((int)$record['id'] === $id) {
                 fclose($handle);
-                return array_combine($headers, $data);
+                return $record;
             }
         }
+
         fclose($handle);
         return null;
     }
 
-    public function getAllUsers()
+    public function addUser(string $name, string $email): bool
     {
-        $filename = __DIR__ . '/../../storage/data/messy_users.csv';
-        $handle = fopen($filename, 'r');
+        $handle  = fopen($this->dataFile, 'r');
         $headers = array_map('strtolower', fgetcsv($handle));
-        $users = [];
-        while (($row = fgetcsv($handle)) !== false) {
-            $users[] = array_combine($headers, $row);
-        }
         fclose($handle);
-        return $users;
+
+        // Auto-increment ID from existing rows
+        $all    = $this->getAllUsers();
+        $nextId = empty($all) ? 1 : max(array_column($all, 'id')) + 1;
+
+        $row = [];
+        foreach ($headers as $col) {
+            $row[] = match ($col) {
+                'id'    => $nextId,
+                'name'  => $name,
+                'email' => $email,
+                default => '',
+            };
+        }
+
+        $handle = fopen($this->dataFile, 'a');
+        if ($handle === false) {
+            return false;
+        }
+
+        try
+        {
+            fputcsv($handle, $row);
+        } catch (Exception $e) {
+            return false;
+        } finally {
+            fclose($handle);
+        }
+        return true;
     }
 }
+
 
 
 
